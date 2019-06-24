@@ -16,7 +16,7 @@ get_hostname () {
 }
 
 get_cpu_number() {
-	cpu_number=%(echo "$lscpu_out" | egrep "^CPU\(s\):" | awk '{print $2}' | xargs)
+	cpu_number=$(echo "$lscpu_out" | egrep "^CPU\(s\):" | awk '{print $2}' | xargs)
 }
 
 #helper function
@@ -33,7 +33,7 @@ get_cpu_architecture() {
 
 
 get_cpu_model() {
-	get_cpu_model "Model:"
+	get_lscpu_value "Model:"
 	cpu_model=$value
 
 
@@ -41,7 +41,7 @@ get_cpu_model() {
 
 
 get_cpu_mhz() {
-	get_cpu_mhz "CPU MHz:"
+	get_lscpu_value "CPU MHz:"
 	cpu_mhz=$value
 
 
@@ -49,10 +49,8 @@ get_cpu_mhz() {
 
 
 get_L2_cache() {
-	get_L2_cache "L2 Cache (in KB) :"
+	get_lscpu_value "L2 cache:"
 	L2_cache=$(echo $value | sed s'/K//') #removes the 'K' from $value
-
-
 }
 
 
@@ -64,8 +62,8 @@ get_cpu_architecture
 get_cpu_model
 get_cpu_mhz
 get_L2_cache
-total_mem=:
-timestamp=$(date "+$Y-$m-$d $H:$M:$S")  #citation: www.cyberciti.biz/faq/linuz-unix-formatting-dates-for-display/
+total_mem=$(cat /proc/meminfo | egrep MemTotal | awk '{print $2}')
+timestamp=$(date +"%Y-%m-%d %H:%M:%S")  #citation: www.cyberciti.biz/faq/linuz-unix-formatting-dates-for-display/
 
 
 
@@ -73,7 +71,7 @@ timestamp=$(date "+$Y-$m-$d $H:$M:$S")  #citation: www.cyberciti.biz/faq/linuz-u
 
 #STEP2: construct INSERT statement
 insert_stmt=$(cat <<-END
-INSERT INTO host_info (hostname, cpu_number, cpu_architecture, cpu_model, cpu_mhz, l2_cache, total_mem, "timestamp") VALUES('${hostname}',${cpu_number},'${cpu_architecture}', '${cpu_model}', ${cpu_mhz}, ${L2_cache}, ${total_mem}, '${timestamp}');
+INSERT INTO host_info (hostname, cpu_number, cpu_architecture, cpu_model, cpu_mhz, L2_cache, total_mem, "timestamp") VALUES('${hostname}',${cpu_number},'${cpu_architecture}', '${cpu_model}', ${cpu_mhz}, ${L2_cache}, ${total_mem}, '${timestamp}');
 END
 )
 echo $insert_stmt
@@ -81,8 +79,8 @@ echo $insert_stmt
 
 
 #STEP3: Execute INSERT statement
-export PGPASSWORD=$password
-psql -h $psql_host -p $port -U $user_name -d $db_name -c "$insert_stmt"
+export PGPASSWORD=$psql_password
+psql -h $psql_host -p $psql_port -U $psql_user -d $db_name -c "$insert_stmt"
 sleep 1
 
 

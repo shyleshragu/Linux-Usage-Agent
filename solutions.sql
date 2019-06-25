@@ -1,29 +1,16 @@
 ##1)
-SELECT 
-cpu_number,
-host_id,
-total_mem OVER (
-PARTITION BY cpu_number
-)
-FROM
-host_usage
-INNER JOIN
-host_info USING (cpu_number);
-ORDER BY cpu_number
-GROUP BY cpu_number
-
+SELECT
+ host_info.cpu_number,
+ host_usage.host_id,
+ host_info.total_mem
+FROM host_info
+ INNER JOIN host_usage ON host_usage.host_id=host_info.id
+ ORDER BY host_info.total_mem DESC;
 
 
 
 ##2)
-SELECT
-host_id,
-host_name,
-total_mem,
-used_memory_percentage=(total_mem - memory_free)/total_mem OVER (
-PARTITION BY host_name, total_mem
-)
-FROM
-host_info
-INNER JOIN
-host_usage USING (host_name, total_mem);
+SELECT host_usage.host_id, host_info.hostname, host_info.total_mem, host_usage.memory_free, CAST((host_info.total_mem - host_usage.memory_free)/host_info.total_mem*100.0000000 as FLOAT(53))
+FROM host_info INNER JOIN host_usage ON host_usage.host_id=host_info.id;
+
+

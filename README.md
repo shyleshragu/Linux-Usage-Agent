@@ -7,6 +7,7 @@
 
 ##ARCHITECTURE AND DESIGN
 #1)
+![Capture](https://user-images.githubusercontent.com/51927842/60114751-75b5df80-9742-11e9-9ca9-aa9ba468b395.JPG)
 
 
 

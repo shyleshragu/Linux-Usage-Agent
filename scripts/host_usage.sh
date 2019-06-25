@@ -9,10 +9,7 @@ psql_user=$4
 psql_password1=$5
 
 
-#get_host_id (){
-#	host_id=$(cat hostid)
 
-#}
 
 get_memory_free(){
 	memory_free=$(vmstat -t | head -n3 | tail -n1 | awk '{print $4}') 
@@ -42,7 +39,7 @@ get_disk_available(){
 
 
 #STEP1: parse data and setup variables
-#get_host_id
+
 get_memory_free
 get_cpu_idel
 get_cpu_kernel
@@ -51,17 +48,13 @@ get_disk_available
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
 
-#STEP4: SAVE HOSTID 
-#host_id=`psql -h localhost -U postgres host_agent -c "select id from host_usage where hostname='${hostname}'" | tail -3 | head -1 | xargs`
-#echo $host_id > ~/host_id
-#cat ~/host_id
-
+#STEP2: SAVE HOSTID 
 host_id=$(cat ~/host_id)
 
 
-#STEP2: construct INSERT statement
+#STEP3: construct INSERT statement
 insert_stmt=$(cat <<-END
-INSERT INTO host_usage ("timestamp",host_id, memory_free, cpu_idel, cpu_kernel, disk_io, disk_available) VALUES('${timestamp}','$host_id',$memory_free, $cpu_idel, $cpu_kernel, $disk_io, $disk_available)
+INSERT INTO host_usage ("timestamp", host_id, memory_free, cpu_idel, cpu_kernel, disk_io, disk_available) VALUES('${timestamp}', '${host_id}', ${memory_free}, ${cpu_idel}, ${cpu_kernel}, ${disk_io}, ${disk_available});
 END
 )
 echo $insert_stmt
@@ -69,9 +62,9 @@ echo $insert_stmt
 
 
 
-#STEP3: EXECUTE INSERT STATEMENT
+#STEP4: EXECUTE INSERT STATEMENT
 export PGPASSWORD=$psql_password1
-psql -h $psql_host -p $psql_port -U $psql_user -d $db_name -c "$host_id" "$insert_stmt"
+psql -h $psql_host -p $psql_port -U $psql_user -d $db_name -c "$insert_stmt"
 sleep 1
 
 

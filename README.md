@@ -1,17 +1,13 @@
-
-
-
 ##INTRODUCTION
 The objective of this project was to develope a Cluster Monitor Agent, that is, program a centralized and streamlined approach in collecting data. This approach helps in alleviating server load and relays data to specific agents allowing them to enrich the locally collected data.
 
 
 ##ARCHITECTURE AND DESIGN
-1)
+
+1) 
 ![Capture](https://user-images.githubusercontent.com/51927842/60114751-75b5df80-9742-11e9-9ca9-aa9ba468b395.JPG)
 
-
-
-2)
+2) 
 Using psql, a database is created under the name "host_agent". Within the database, two tables were created named host_info and host_usage.
 The purpose of "host_info" table was to collect and store information such as id, hostname, cpu number, cpu architecture, cpu model, cpu mhz, L2 cache, timestamp, and total memory.
 The puspose of "host_usage" table was to collect and store information such as timestamp, host id, free memory, cpu idel, cpu kernel, disk io, available disk space.
@@ -63,8 +59,6 @@ CONSTRAINT host_usage_host_fk FOREIGN KEY (host_id) REFERENCES host_info(id)
 );
 
 
-
-
 2)
 To execute host_info.sh
 bash ./host_info.sh localhost 5432 host_agent postgres password
@@ -74,18 +68,13 @@ To execute host_usage.sh
 bash ./host_usage.sh localhost 5432 host_agent postgres password
 
 4)
-
 enter crontab by typing "crontab -e" in cmd prompt
 * * * * * bash /...directory/host_usage.sh localhost 5432 host_agent postgres password > /tmp/host_usage.log
 
 host_usage.sh is executed every minite and stored in database and /tmp/host_usage.log
 
 
-
 ##IMPROVEMENTS 
 1) handle hardware update
 2) script run-time minimization
 3) bash scripting needs improvement
-
-
-
